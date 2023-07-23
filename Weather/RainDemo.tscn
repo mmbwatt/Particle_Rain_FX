@@ -1,0 +1,210 @@
+[gd_scene load_steps=18 format=3 uid="uid://vkv2vhhklqag"]
+
+[ext_resource type="Material" uid="uid://42xpt2obxuji" path="res://Weather/Rain/cartoon_rain_particle_process_material.tres" id="1_6nh3j"]
+[ext_resource type="Script" path="res://Weather/RainDemo.gd" id="1_j314w"]
+[ext_resource type="RibbonTrailMesh" uid="uid://8f4uu1y7laye" path="res://Weather/Rain/realish_rain_particle_process_material.tres" id="2_tm3qd"]
+[ext_resource type="Texture2D" uid="uid://c2hdi3po6xxps" path="res://Weather/industrial_sunset_puresky_4k.exr" id="3_oteca"]
+[ext_resource type="PackedScene" uid="uid://swa2s8k8xj0d" path="res://Player/Player.tscn" id="4_ku36v"]
+[ext_resource type="Material" uid="uid://bpijh02nej7a" path="res://Weather/Rain/personal_cartoon_rain_particle_process_material.tres" id="5_wcv1e"]
+[ext_resource type="Material" uid="uid://c3ev2xmxjpya" path="res://Weather/Rain/personal_realish_rain_particle_process_material.tres" id="6_rer2g"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4asbi"]
+albedo_color = Color(0, 0.184314, 0, 1)
+metallic = 0.2
+roughness = 0.65
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_7jih3"]
+material = SubResource("StandardMaterial3D_4asbi")
+size = Vector2(20, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0ld3w"]
+size = Vector3(20, 1, 20)
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_j5asc"]
+panorama = ExtResource("3_oteca")
+
+[sub_resource type="Sky" id="Sky_p270d"]
+sky_material = SubResource("PanoramaSkyMaterial_j5asc")
+
+[sub_resource type="Environment" id="Environment_woh2x"]
+background_mode = 2
+sky = SubResource("Sky_p270d")
+volumetric_fog_enabled = true
+volumetric_fog_emission = Color(0.423529, 0.423529, 0.423529, 1)
+
+[sub_resource type="Curve" id="Curve_i4pj7"]
+_data = [Vector2(0, 0.209091), 0.0, 0.0, 0, 0, Vector2(0.0862069, 0.554545), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d3u68"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+use_particle_trails = true
+
+[sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_jy7b6"]
+material = SubResource("StandardMaterial3D_d3u68")
+size = 0.2
+sections = 4
+section_length = 0.1
+curve = SubResource("Curve_i4pj7")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_c7fo5"]
+emission_shape = 3
+emission_box_extents = Vector3(10, 1, 10)
+direction = Vector3(0, -1, 0)
+spread = 5.0
+initial_velocity_min = 10.0
+initial_velocity_max = 10.0
+color = Color(1, 1, 1, 0.352941)
+collision_mode = 1
+collision_friction = 0.0
+collision_bounce = 0.0
+
+[node name="RainDemo" type="Node3D" node_paths=PackedStringArray("_real_rain", "_cartoon_rain", "_personal_real_rain", "_personal_cartoon_rain", "_env_rain", "_personal_rain", "_player_on", "_player_off", "_env_on", "_env_off", "_cartoon_rain_button", "_real_rain_button")]
+script = ExtResource("1_j314w")
+_real_rain = NodePath("Env_Rain/Rain_Realish")
+_cartoon_rain = NodePath("Env_Rain/Rain_Cartoon")
+_personal_real_rain = NodePath("Player/Personal_Rain/Rain_Realish2")
+_personal_cartoon_rain = NodePath("Player/Personal_Rain/Rain_Cartoon2")
+_env_rain = NodePath("Env_Rain")
+_personal_rain = NodePath("Player/Personal_Rain")
+_player_on = NodePath("UI/MarginContainer/VBoxContainer/PlayerRainOnButton")
+_player_off = NodePath("UI/MarginContainer/VBoxContainer/PlayerRainOffButton")
+_env_on = NodePath("UI/MarginContainer/VBoxContainer/RainOn")
+_env_off = NodePath("UI/MarginContainer/VBoxContainer/RainOff")
+_cartoon_rain_button = NodePath("UI/MarginContainer/VBoxContainer/CartoonRainButton")
+_real_rain_button = NodePath("UI/MarginContainer/VBoxContainer/RealRainButton")
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_7jih3")
+
+[node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+size = Vector3(25, 2, 25)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Ground"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_0ld3w")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_woh2x")
+
+[node name="Player" parent="." instance=ExtResource("4_ku36v")]
+
+[node name="Personal_Rain" type="Node3D" parent="Player"]
+
+[node name="Rain_Cartoon2" type="GPUParticles3D" parent="Player/Personal_Rain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11, 0)
+visible = false
+amount = 1000
+preprocess = 1.0
+randomness = 0.85
+visibility_aabb = AABB(-4, -12, -4, 8, 12, 8)
+trail_enabled = true
+trail_lifetime = 0.1
+process_material = ExtResource("5_wcv1e")
+draw_pass_1 = SubResource("RibbonTrailMesh_jy7b6")
+
+[node name="Rain_Realish2" type="GPUParticles3D" parent="Player/Personal_Rain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11, 0)
+amount = 1000
+preprocess = 1.0
+randomness = 0.85
+visibility_aabb = AABB(-4, -12, -4, 8, 12, 8)
+trail_enabled = true
+trail_lifetime = 0.1
+process_material = ExtResource("6_rer2g")
+draw_pass_1 = ExtResource("2_tm3qd")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -99.0
+offset_top = -129.0
+offset_right = 99.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer"]
+layout_mode = 2
+
+[node name="PlayerRainOnButton" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "Player Rain On"
+
+[node name="PlayerRainOffButton" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Player Rain Off"
+
+[node name="RainOn" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "External Rain On"
+
+[node name="RainOff" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "External Rain Off"
+
+[node name="CartoonRainButton" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Switch to \"Cartoon\" Rain"
+
+[node name="RealRainButton" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "Switch to \"Real\" Rain"
+
+[node name="Env_Rain" type="Node3D" parent="."]
+visible = false
+
+[node name="Rain_Cartoon" type="GPUParticles3D" parent="Env_Rain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11, 0)
+visible = false
+amount = 1000
+lifetime = 3.0
+preprocess = 3.0
+randomness = 0.85
+visibility_aabb = AABB(-4, -12, -4, 8, 12, 8)
+trail_enabled = true
+trail_lifetime = 0.1
+process_material = ExtResource("1_6nh3j")
+draw_pass_1 = SubResource("RibbonTrailMesh_jy7b6")
+
+[node name="Rain_Realish" type="GPUParticles3D" parent="Env_Rain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11, 0)
+amount = 1000
+preprocess = 1.0
+randomness = 0.85
+visibility_aabb = AABB(-4, -12, -4, 8, 12, 8)
+trail_enabled = true
+trail_lifetime = 0.1
+process_material = SubResource("ParticleProcessMaterial_c7fo5")
+draw_pass_1 = ExtResource("2_tm3qd")
+
+[connection signal="pressed" from="UI/MarginContainer/VBoxContainer/PlayerRainOnButton" to="." method="_on_player_rain_on_button_pressed"]
+[connection signal="pressed" from="UI/MarginContainer/VBoxContainer/PlayerRainOffButton" to="." method="_on_player_rain_off_button_pressed"]
+[connection signal="pressed" from="UI/MarginContainer/VBoxContainer/RainOn" to="." method="_on_rain_on_pressed"]
+[connection signal="pressed" from="UI/MarginContainer/VBoxContainer/RainOff" to="." method="_on_rain_off_pressed"]
+[connection signal="pressed" from="UI/MarginContainer/VBoxContainer/CartoonRainButton" to="." method="_on_cartoon_rain_button_pressed"]
+[connection signal="pressed" from="UI/MarginContainer/VBoxContainer/RealRainButton" to="." method="_on_real_rain_button_pressed"]
