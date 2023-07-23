@@ -1,0 +1,42 @@
+[gd_scene load_steps=9 format=3 uid="uid://dxpedufhv8b2d"]
+
+[ext_resource type="PackedScene" uid="uid://swa2s8k8xj0d" path="res://Player/Player.tscn" id="1_wyj3i"]
+[ext_resource type="Texture2D" uid="uid://c2hdi3po6xxps" path="res://Weather/industrial_sunset_puresky_4k.exr" id="2_kjd1q"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7f8e1"]
+albedo_color = Color(0.0470588, 0.121569, 0, 1)
+metallic = 0.11
+roughness = 0.95
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_l7bjh"]
+size = Vector2(20, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_do6wo"]
+size = Vector3(20, 0.5, 20)
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_03188"]
+panorama = ExtResource("2_kjd1q")
+
+[sub_resource type="Sky" id="Sky_067cw"]
+sky_material = SubResource("PanoramaSkyMaterial_03188")
+
+[sub_resource type="Environment" id="Environment_pdtu4"]
+background_mode = 2
+sky = SubResource("Sky_067cw")
+
+[node name="TestMove" type="Node3D"]
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_7f8e1")
+mesh = SubResource("PlaneMesh_l7bjh")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Ground"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+shape = SubResource("BoxShape3D_do6wo")
+
+[node name="Player" parent="." instance=ExtResource("1_wyj3i")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_pdtu4")
